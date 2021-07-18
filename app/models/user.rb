@@ -5,4 +5,5 @@ class User < ApplicationRecord
     has_one :budget, dependent: :destroy
 
     validates_presence_of :name, :email, :password_digest
+    validates :email, uniqueness: true
 end
