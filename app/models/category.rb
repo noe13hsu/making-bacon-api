@@ -1,5 +1,5 @@
 class Category < ApplicationRecord
-  enum type: { income: 0, expense: 1 } #, _prefix: true
+  enum category_type: { income: 0, expense: 1 } #, _prefix: true
   
   belongs_to :user
 
