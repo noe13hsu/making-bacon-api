@@ -3,6 +3,8 @@ module Api
         class CategoriesController < ApplicationController
             before_action :set_category, only: [:show, :update, :destroy]
 
+            rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+
             def income
                 income_categories = Category.select { |entry| entry.category_type == "income" }
 
@@ -54,6 +56,10 @@ module Api
 
             def category_params
                 params.require(:category).permit(:user_id, :description, :category_type)
+            end
+
+            def record_not_found(e)
+                render json: { error: e.message }, status: :not_found
             end
         end
     end
