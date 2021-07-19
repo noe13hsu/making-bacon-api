@@ -1,4 +1,4 @@
-class IncomeCategoriesRepresenter
+class CategoriesRepresenter
     def initialize(categories)
         @categories = categories
     end
@@ -8,7 +8,7 @@ class IncomeCategoriesRepresenter
             {
                 id: category.id,
                 description: category.description,
-                type: "income",
+                type: category.category_type,
             }
         end
     end

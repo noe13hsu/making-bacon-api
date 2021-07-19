@@ -4,7 +4,13 @@ module Api
             def income
                 income_categories = Category.select { |entry| entry.category_type == "income" }
 
-                render json: IncomeCategoriesRepresenter.new(income_categories).as_json
+                render json: CategoriesRepresenter.new(income_categories).as_json
+            end
+
+            def expense
+                expense_categories = Category.select { |entry| entry.category_type == "expense" }
+
+                render json: CategoriesRepresenter.new(expense_categories).as_json
             end
 
             def create
@@ -15,6 +21,12 @@ module Api
                 else
                     render json: category.errors, status: :unprocessable_entity
                 end
+            end
+
+            def destroy
+                Category.find(params[:id]).destroy!
+
+                head :no_content
             end
 
             private
