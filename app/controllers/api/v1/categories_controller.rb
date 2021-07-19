@@ -1,6 +1,8 @@
 module Api
     module V1
         class CategoriesController < ApplicationController
+            before_action :set_category, except: [:index, :create, :income, :expense]
+
             def income
                 income_categories = Category.select { |entry| entry.category_type == "income" }
 
@@ -19,17 +21,30 @@ module Api
                 if category.save
                     render json: CategoryRepresenter.new(category).as_json, status: :created
                 else
-                    render json: category.errors, status: :unprocessable_entity
+                    render json: { error: "Failed to create category" }, status: :unprocessable_entity
+                end
+            end
+
+            def update
+                category = @category
+                if category.update(category_params)
+                    render json: CategoryRepresenter.new(category).as_json
+                else
+                    render json: { error: "Failed to update category" }, status: :unprocessable_entity
                 end
             end
 
             def destroy
-                Category.find(params[:id]).destroy!
+                @category.destroy!
 
                 head :no_content
             end
 
             private
+
+            def set_category
+                @category = Category.find(params[:id])
+            end
 
             def category_params
                 params.require(:category).permit(:user_id, :description, :category_type)
