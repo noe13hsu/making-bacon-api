@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
       # post 'categories', to: 'categories#create'
       get 'category/income', to: 'categories#income'
+      get 'category/expense', to: 'categories#expense'
     end
   end
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
