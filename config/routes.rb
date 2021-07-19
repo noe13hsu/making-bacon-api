@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       resources :categories
       resources :users
 
+      # post 'categories', to: 'categories#create'
       get 'category/income', to: 'categories#income'
     end
   end
