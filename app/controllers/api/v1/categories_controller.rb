@@ -1,7 +1,7 @@
 module Api
     module V1
         class CategoriesController < ApplicationController
-            before_action :set_category, except: [:index, :create, :income, :expense]
+            before_action :set_category, only: [:show, :update, :destroy]
 
             def income
                 income_categories = Category.select { |entry| entry.category_type == "income" }
@@ -13,6 +13,12 @@ module Api
                 expense_categories = Category.select { |entry| entry.category_type == "expense" }
 
                 render json: CategoriesRepresenter.new(expense_categories).as_json
+            end
+
+            def show
+                category = @category
+
+                render json: CategoryRepresenter.new(category).as_json
             end
 
             def create
