@@ -6,6 +6,7 @@ module Api
 
            render json: IncomeCategoriesRepresenter.new(income_categories).as_json
            end
+        
         end
     end
 end
