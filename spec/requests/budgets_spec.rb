@@ -1,7 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe "Budgets", type: :request do
-  describe "GET /index" do
-    pending "add some examples (or delete) #{__FILE__}"
-  end
+  let!(:user) {FactoryBot.create(:user, name: "John", email: "john@gmail.com", password_digest: "abc111")}
+
+  let!(:budget) {FactoryBot.create(:budget, user_id: user.id, amount: 1000)}
+
+  describe 'GET /user/:user_id/budget' do
+    it 'returns user budget'
+      
 end
