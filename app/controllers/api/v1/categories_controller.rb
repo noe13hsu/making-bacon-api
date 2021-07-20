@@ -1,18 +1,24 @@
 module Api
     module V1
         class CategoriesController < ApplicationController
-            before_action :set_category, only: [:show, :update, :destroy]
+            before_action :current_user_category_selection, only: [:show, :update, :destroy]
 
             rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
+            def index
+                categories = Category.select { |entry| entry.user_id == params[:user_id].to_i}
+
+                render json: CategoriesRepresenter.new(categories).as_json
+            end
+
             def income
-                income_categories = Category.select { |entry| entry.category_type == "income" }
+                income_categories = current_user_category_type("income")
 
                 render json: CategoriesRepresenter.new(income_categories).as_json
             end
 
             def expense
-                expense_categories = Category.select { |entry| entry.category_type == "expense" }
+                expense_categories = current_user_category_type("expense")
 
                 render json: CategoriesRepresenter.new(expense_categories).as_json
             end
@@ -50,16 +56,20 @@ module Api
 
             private
 
-            def set_category
-                @category = Category.find(params[:id])
+            def current_user_category_selection
+                @category = Category.select { |entry| entry.user_id == params[:user_id].to_i }.find { |entry| entry.id == params[:id].to_i }
+            end
+
+            def current_user_category_type(type)
+                Category.select { |entry| entry.user_id == params[:user_id].to_i && entry.category_type == type }
             end
 
             def category_params
-                params.require(:category).permit(:user_id, :description, :category_type)
+                params.require(:category).permit(:user_id, :description, :category_type, :id)
             end
 
-            def record_not_found(e)
-                render json: { error: e.message }, status: :not_found
+            def record_not_found()
+                render json: { error: "Unprocessable request" }, status: :unprocessable_entity
             end
         end
     end

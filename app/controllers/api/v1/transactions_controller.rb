@@ -1,7 +1,7 @@
 module Api
     module V1
         class TransactionsController < ApplicationController
-            before_action :current_user_transactions, only: [:show, :update, :destroy]
+            before_action :current_user_transaction_selection, only: [:show, :update, :destroy]
 
             rescue_from NoMethodError, with: :record_not_found
 
@@ -55,7 +55,7 @@ module Api
             end
 
             private
-            def current_user_transactions
+            def current_user_transaction_selection
                 @transaction = Transaction.select { |entry| entry.category.user_id == params[:user_id].to_i }.find { |entry| entry.id == params[:id].to_i }
             end
 
