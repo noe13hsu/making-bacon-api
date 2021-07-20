@@ -9,10 +9,10 @@ describe 'Categories API', type: :request do
   let!(:rental) {FactoryBot.create(:category, description: "rental", category_type: "income", user_id: user.id)}
   let!(:interest) {FactoryBot.create(:category, description: "interest", category_type: "income", user_id: user.id)}
 
-  describe 'POST /categories' do
+  describe 'POST /user/:user_id/categories' do
     it 'creates a new expense category' do
       expect {
-          post '/api/v1/user/categories', params: { category: {description: "gifts", user_id: user.id, category_type: "expense"} }
+          post "/api/v1/user/#{user.id}/categories", params: { category: {description: "gifts", user_id: user.id, category_type: "expense"} }
       }.to change { category_type("expense").count }.from(2).to(3)
 
       expect(response).to have_http_status(:created)
@@ -27,7 +27,7 @@ describe 'Categories API', type: :request do
 
     it 'creates a new income category' do
       expect {
-          post '/api/v1/user/categories', params: { category: {description: "employment", user_id: user.id, category_type: "income"} }
+          post "/api/v1/user/#{user.id}/categories", params: { category: {description: "employment", user_id: user.id, category_type: "income"} }
       }.to change { category_type("income").count }.from(2).to(3)
 
       expect(response).to have_http_status(:created)
@@ -44,7 +44,7 @@ describe 'Categories API', type: :request do
   describe 'DELETE /categories/:id' do
     it 'deletes a category' do
       expect {
-          delete "/api/v1/user/categories/#{food.id}"
+          delete "/api/v1/user/#{user.id}/categories/#{food.id}"
       }.to change { Category.where(id: food.id).exists? }.from(true).to(false) 
 
       expect(response).to have_http_status(:no_content)
@@ -53,7 +53,7 @@ describe 'Categories API', type: :request do
 
   describe 'GET /categories/:id' do
     it 'returns a category' do
-      get "/api/v1/user/categories/#{transportation.id}"
+      get "/api/v1/user/#{user.id}/categories/#{transportation.id}"
 
       expect(response).to have_http_status(:success)
       expect(response_body).to eq(
@@ -64,7 +64,7 @@ describe 'Categories API', type: :request do
 
   describe 'GET /expense_categories/' do
     it 'returns all expense categories' do
-      get "/api/v1/user/expense_categories"
+      get "/api/v1/user/#{user.id}/expense_categories"
 
       expect(response).to have_http_status(:success)
       expect(response_body).to eq(
@@ -78,7 +78,7 @@ describe 'Categories API', type: :request do
 
   describe 'GET /income_categories/' do
     it 'returns all income categories' do
-      get "/api/v1/user/income_categories"
+      get "/api/v1/user/#{user.id}/income_categories"
 
       expect(response).to have_http_status(:success)
       expect(response_body).to eq(
@@ -93,7 +93,7 @@ describe 'Categories API', type: :request do
   describe 'PUT /categories/:id' do
     it 'updates a category description' do
       expect {
-          put "/api/v1/user/categories/#{food.id}", params: { category: {description: "drink", user_id: user.id, category_type: "expense"} }
+          put "/api/v1/user/#{user.id}/categories/#{food.id}", params: { category: {description: "drink", user_id: user.id, category_type: "expense"} }
       }.to change { Category.find(food.id).description }.from("food").to("drink")
 
       expect(response).to have_http_status(:success)
@@ -104,7 +104,7 @@ describe 'Categories API', type: :request do
 
     it 'updates a category type' do
       expect {
-          put "/api/v1/user/categories/#{interest.id}", params: { category: {description: "interest", user_id: user.id, category_type: "expense"} }
+          put "/api/v1/user/#{user.id}/categories/#{interest.id}", params: { category: {description: "interest", user_id: user.id, category_type: "expense"} }
       }.to change { Category.find(interest.id).category_type }.from("income").to("expense")
 
       expect(response).to have_http_status(:success)
