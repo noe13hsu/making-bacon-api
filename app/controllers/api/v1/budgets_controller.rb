@@ -1,19 +1,18 @@
 module Api
     module V1
         class BudgetsController < ApplicationController
-            before_action :set_budget, only: [:show, :update]
+            before_action :current_user_budget, only: [:index, :update]
 
-            def show
-                def show
+            def index
                     budget = @budget
     
                     render json: BudgetRepresenter.new(budget).as_json
-                end
             end
 
             def update
-                if @budget.update(budget_params)
-                    render json: { budget: @budget }
+                budget = @budget
+                if budget.update(budget_params)
+                    render json: BudgetRepresenter.new(budget).as_json
                 else
                     render json: { error: "Failed to update transaction" }, status: :unprocessable_entity
                 end
@@ -21,7 +20,7 @@ module Api
 
             private
 
-            def set_budget
+            def current_user_budget
                 @budget = Budget.find_by(user_id: params[:user_id])
             end
 
