@@ -1,18 +1,24 @@
 module Api
     module V1
         class TransactionsController < ApplicationController
-            before_action :set_transaction, only: [:show, :update, :destroy]
+            before_action :current_user_transactions, only: [:show, :update, :destroy]
 
-            rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+            rescue_from NoMethodError, with: :record_not_found
+
+            def index
+                transactions = Transaction.select { |entry| entry.category.user_id == params[:user_id].to_i}
+
+                render json: TransactionsRepresenter.new(transactions).as_json
+            end
 
             def income
-                income_transactions = Transaction.select { |entry| entry.category.category_type == "income" }
+                income_transactions = current_user_transaction_type("income")
 
                 render json: TransactionsRepresenter.new(income_transactions).as_json
             end
 
             def expense
-                expense_transactions = Transaction.select { |entry| entry.category.category_type == "expense" }
+                expense_transactions = current_user_transaction_type("expense")
 
                 render json: TransactionsRepresenter.new(expense_transactions).as_json
             end
@@ -49,17 +55,20 @@ module Api
             end
 
             private
+            def current_user_transactions
+                @transaction = Transaction.select { |entry| entry.category.user_id == params[:user_id].to_i }.find { |entry| entry.id == params[:id].to_i }
+            end
 
-            def set_transaction
-                @transaction = Transaction.find(params[:id])
+            def current_user_transaction_type(type)
+                Transaction.select { |entry| entry.category.user_id == params[:user_id].to_i && entry.category.category_type == type }
             end
 
             def transaction_params
-                params.require(:transaction).permit(:category_id, :description, :amount, :date)
+                params.require(:transaction).permit(:category_id, :description, :amount, :date, :user_id, :id)
             end
 
-            def record_not_found(e)
-                render json: { error: e.message }, status: :not_found
+            def record_not_found
+                render json: { error: "Unprocessable request" }, status: :unprocessable_entity
             end
         end
     end

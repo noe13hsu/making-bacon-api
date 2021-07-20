@@ -8,6 +8,6 @@ module RequestHelper
     end
 
     def transaction_category_type(type)
-        Transaction.select { |t| t.category.category_type == type }
+        Transaction.select { |t| t.category.category_type == type && t.category.user_id}
     end
 end
