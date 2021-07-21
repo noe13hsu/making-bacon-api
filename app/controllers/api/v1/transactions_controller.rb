@@ -3,12 +3,13 @@ module Api
         class TransactionsController < ApplicationController
             before_action :current_user_transaction_selection, only: [:show, :update, :destroy]
 
-            rescue_from NoMethodError, with: :record_not_found
-
             def index
+                # if User.find(params[:user_id])
                 transactions = Transaction.select { |entry| entry.category.user_id == params[:user_id].to_i}
 
                 render json: TransactionsRepresenter.new(transactions).as_json
+                # else record_not_found
+                # end
             end
 
             def income
@@ -65,10 +66,6 @@ module Api
 
             def transaction_params
                 params.require(:transaction).permit(:category_id, :description, :amount, :date, :user_id, :id)
-            end
-
-            def record_not_found
-                render json: { error: "Unprocessable request" }, status: :unprocessable_entity
             end
         end
     end
