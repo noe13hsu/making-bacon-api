@@ -3,8 +3,6 @@ module Api
         class CategoriesController < ApplicationController
             before_action :current_user_category_selection, only: [:show, :update, :destroy]
 
-            rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
-
             def index
                 categories = Category.select { |entry| entry.user_id == params[:user_id].to_i}
 
@@ -66,10 +64,6 @@ module Api
 
             def category_params
                 params.require(:category).permit(:user_id, :description, :category_type, :id)
-            end
-
-            def record_not_found()
-                render json: { error: "Unprocessable request" }, status: :unprocessable_entity
             end
         end
     end

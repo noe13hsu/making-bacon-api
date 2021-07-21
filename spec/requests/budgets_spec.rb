@@ -5,9 +5,9 @@ describe "Budgets API", type: :request do
 
   let!(:budget) {FactoryBot.create(:budget, user_id: user.id, amount: 1000)}
 
-  describe 'GET /user/:user_id/budget' do
+  describe 'GET /users/:user_id/budget' do
     it 'returns user budget' do
-      get "/api/v1/user/#{user.id}/budget"
+      get "/api/v1/users/#{user.id}/budget"
 
       expect(response).to have_http_status(:success)
       expect(response_body).to eq(
@@ -16,11 +16,11 @@ describe "Budgets API", type: :request do
     end
   end
 
-  describe 'PUT /user/:user_id/budget' do
+  describe 'PUT /users/:user_id/budget' do
     it 'updates user budget' do
       expect {
-      put "/api/v1/user/#{user.id}/budget", params: { budget: {user_id: user.id, amount: 1500} }
-    }.to change { User.find(user.id).budget.amount }.from(1000).to(1500)
+        put "/api/v1/users/#{user.id}/budget", params: { budget: {user_id: user.id, amount: 1500} }
+      }.to change { User.find(user.id).budget.amount }.from(1000).to(1500)
 
       expect(response).to have_http_status(:success)
       expect(response_body).to eq(
