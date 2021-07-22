@@ -6,10 +6,11 @@ module Api
             rescue_from ActionController::ParameterMissing, with: :parameter_missing
             rescue_from AuthenticationError, with: :handle_unauthenticated
 
+            before_action :authenticate, except: [:login, :create]
             before_action :current_user, only: [:show, :update, :destroy]
 
             def login
-                raise AuthenticationError unless user.authenticate(params.require(:password))
+                raise AuthenticationError unless user.authenticate(user_params[:password])
                 token = AuthenticationTokenService.call(user.id)
 
                 render json: { token: token }, status: :created 
@@ -49,7 +50,7 @@ module Api
             private
 
             def user
-                @user ||= User.find_by_email(params.require(:email))
+                @user ||= User.find_by_email(user_params[:email])
             end
 
             def current_user
