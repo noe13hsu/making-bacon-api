@@ -8,7 +8,7 @@
 
 User.destroy_all
 
-noe = User.create!(name: "Noe", email: "noe@gmail.com", password_digest: "111111")
+noe = User.create!(name: "Noe", email: "noe@gmail.com", password: "111111")
 
 category_food = Category.create!(user_id: noe.id, description: "food", category_type: 1)
 category_gifts = Category.create!(user_id: noe.id, description: "gifts", category_type: 1)
