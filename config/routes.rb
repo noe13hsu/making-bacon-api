@@ -22,7 +22,6 @@ Rails.application.routes.draw do
         put '/:user_id', to: 'users#update'
         patch '/:user_id', to: 'users#update'
         delete '/:user_id', to: 'users#delete'
-        post '/new', to: 'users#create'
       end
     end
   end

@@ -9,7 +9,6 @@ module Api
             before_action :current_user, only: [:show, :update, :destroy]
 
             def login
-                user = User.find_by_email(params.require(:email))
                 raise AuthenticationError unless user.authenticate(params.require(:password))
                 token = AuthenticationTokenService.call(user.id)
 
@@ -49,16 +48,20 @@ module Api
 
             private
 
+            def user
+                @user ||= User.find_by_email(params.require(:email))
+            end
+
             def current_user
                 @user = User.find(params[:user_id])
             end
 
             def user_params
-                params.require(:user).permit(:name, :email, :password)
+                params.permit(:name, :email, :password)
             end
 
             def update_user_params
-                params.require(:user).permit(:name, :password)
+                params.permit(:name, :password)
             end
 
             def handle_unauthenticated
