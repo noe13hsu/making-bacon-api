@@ -6,7 +6,7 @@ module Api
             rescue_from ActionController::ParameterMissing, with: :parameter_missing
             rescue_from AuthenticationError, with: :handle_unauthenticated
 
-            before_action :authenticate, except: [:login, :create]
+            # before_action :authenticate, except: [:login, :create]
             before_action :current_user, only: [:show, :update, :destroy]
 
             def login
