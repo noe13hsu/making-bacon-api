@@ -4,9 +4,10 @@ module Api
             class AuthenticationError < StandardError; end
 
             rescue_from ActionController::ParameterMissing, with: :parameter_missing
+            rescue_from NoMethodError, with: :handle_unauthenticated
             rescue_from AuthenticationError, with: :handle_unauthenticated
 
-            before_action :authenticate, except: [:login, :create]
+            # before_action :authenticate, except: [:login, :create]
             before_action :current_user, only: [:show, :update, :destroy]
 
             def login
@@ -66,7 +67,7 @@ module Api
             end
 
             def handle_unauthenticated
-                head :unauthorized
+                render json: { error: 'Username or password incorrect' }, status: :unauthorized
             end
 
             def parameter_missing

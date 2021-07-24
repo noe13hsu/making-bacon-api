@@ -1,7 +1,7 @@
 module Api
     module V1
         class BudgetsController < ApplicationController
-            before_action :authenticate
+            # before_action :authenticate
             before_action :current_user_budget, only: [:index, :update]
 
             def index
