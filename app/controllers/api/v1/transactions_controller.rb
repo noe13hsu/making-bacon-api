@@ -1,7 +1,7 @@
 module Api
     module V1
         class TransactionsController < ApplicationController
-            # before_action :authenticate
+            before_action :authenticate
             before_action :current_user_transaction_selection, only: [:show, :update, :destroy]
 
             def index
