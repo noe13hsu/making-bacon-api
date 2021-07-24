@@ -6,5 +6,4 @@ class Category < ApplicationRecord
   has_many :transactions, dependent: :destroy
 
   validates_presence_of :description, :category_type
-  validates :description, uniqueness: true
 end
