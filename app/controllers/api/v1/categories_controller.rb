@@ -1,26 +1,26 @@
 module Api
     module V1
         class CategoriesController < ApplicationController
-            # before_action :authenticate
+            before_action :authenticate
             before_action :current_user_category_selection, only: [:show, :update, :destroy]
 
             def index
-                categories = Category.select { |entry| entry.user_id == params[:user_id].to_i}
+                categories = Category.select { |entry| entry.user_id == @user_id.to_i}
 
                 render json: CategoriesRepresenter.new(categories).as_json
             end
 
-            def income
-                income_categories = current_user_category_type("income")
+            # def income
+            #     income_categories = current_user_category_type("income")
 
-                render json: CategoriesRepresenter.new(income_categories).as_json
-            end
+            #     render json: CategoriesRepresenter.new(income_categories).as_json
+            # end
 
-            def expense
-                expense_categories = current_user_category_type("expense")
+            # def expense
+            #     expense_categories = current_user_category_type("expense")
 
-                render json: CategoriesRepresenter.new(expense_categories).as_json
-            end
+            #     render json: CategoriesRepresenter.new(expense_categories).as_json
+            # end
 
             def show
                 category = @category
@@ -56,11 +56,7 @@ module Api
             private
 
             def current_user_category_selection
-                @category = Category.select { |entry| entry.user_id == params[:user_id].to_i }.find { |entry| entry.id == params[:id].to_i }
-            end
-
-            def current_user_category_type(type)
-                Category.select { |entry| entry.user_id == params[:user_id].to_i && entry.category_type == type }
+                @category = Category.select { |entry| entry.user_id == @user_id.to_i }.find { |entry| entry.id == params[:id].to_i }
             end
 
             def category_params

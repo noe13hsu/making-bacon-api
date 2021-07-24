@@ -4,25 +4,34 @@ Rails.application.routes.draw do
       post '/register', to: 'users#create'
       post '/login', to: 'users#login'
 
-      scope :users do
-        resources :transactions, path: '/:user_id/transactions'
-        resources :categories, path: '/:user_id/categories'
+      get '/user/transactions', to: "transactions#index"
+      post '/user/transactions', to: "transactions#create"
+      get '/user/transactions/:id', to: "transactions#show"
+      put '/user/transactions/:id', to: "transactions#update"
+      patch '/user/transactions/:id', to: "transactions#update"
+      delete '/user/transactions/:id', to: "transactions#destroy"
 
-        get '/:user_id/income_categories', to: 'categories#income'
-        get '/:user_id/expense_categories', to: 'categories#expense'
+      get '/user/categories', to: "categories#index"
+      post '/user/categories', to: "categories#create"
+      get '/user/categories/:id', to: "categories#show"
+      put '/user/categories/:id', to: "categories#update"
+      patch '/user/categories/:id', to: "categories#update"
+      delete '/user/categories/:id', to: "categories#destroy"
 
-        get '/:user_id/expense_transactions', to: 'transactions#expense'
-        get '/:user_id/income_transactions', to: 'transactions#income'
+      # get '/user/income_categories', to: 'categories#income'
+      # get '/user/expense_categories', to: 'categories#expense'
 
-        get '/:user_id/budget', to: 'budgets#index'
-        put '/:user_id/budget', to: 'budgets#update'
-        patch '/:user_id/budget', to: 'budgets#update'
+      # get '/user/expense_transactions', to: 'transactions#expense'
+      # get '/user/income_transactions', to: 'transactions#income'
 
-        get '/:user_id', to: 'users#show'
-        put '/:user_id', to: 'users#update'
-        patch '/:user_id', to: 'users#update'
-        delete '/:user_id', to: 'users#delete'
-      end
+      get '/user/budget', to: 'budgets#index'
+      put '/user/budget', to: 'budgets#update'
+      patch '/user/budget', to: 'budgets#update'
+
+      get '/user/me', to: 'users#show'
+      put '/user/me', to: 'users#update'
+      patch '/user/me', to: 'users#update'
+      delete '/user/me', to: 'users#delete'
     end
   end
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
