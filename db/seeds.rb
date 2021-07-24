@@ -17,7 +17,7 @@ category_transportation = Category.create!(user_id: noe.id, description: "transp
 
 category_food_kate = Category.create!(user_id: kate.id, description: "food", category_type: 1)
 category_gifts_kate = Category.create!(user_id: kate.id, description: "gifts", category_type: 1)
-category_transportation_kate = Category.create!(user_id: kate.id, description: "transportation", category_type: 1)
+category_transportation_kate = Category.create!(user_id: kate.id, description: "transportation2", category_type: 1)
 
 category_employment = Category.create!(user_id: noe.id, description: "employment", category_type: 0)
 category_investment = Category.create!(user_id: noe.id, description: "investment", category_type: 0)
