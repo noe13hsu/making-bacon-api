@@ -1,13 +1,13 @@
 module Api
     module V1
         class BudgetsController < ApplicationController
-            # before_action :authenticate
+            before_action :authenticate
             before_action :current_user_budget, only: [:index, :update]
 
             def index
-                    budget = @budget
-    
-                    render json: BudgetRepresenter.new(budget).as_json
+                budget = @budget
+
+                render json: BudgetRepresenter.new(budget).as_json
             end
 
             def update
@@ -22,7 +22,7 @@ module Api
             private
 
             def current_user_budget
-                @budget = Budget.find_by(user_id: params[:user_id])
+                @budget = Budget.find_by(user_id: @user_id)
             end
 
             def budget_params
