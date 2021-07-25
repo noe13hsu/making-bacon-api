@@ -7,7 +7,7 @@ module Api
             rescue_from NoMethodError, with: :handle_unauthenticated
             rescue_from AuthenticationError, with: :handle_unauthenticated
 
-            # before_action :authenticate, except: [:login, :create]
+            before_action :authenticate, except: [:login, :create]
             before_action :current_user, only: [:show, :update, :destroy]
 
             def login
@@ -27,7 +27,9 @@ module Api
                 user = User.new(user_params)
 
                 if user.save
-                    render json: UserRepresenter.new(user).as_json, status: :created
+                    new_user = User.find_by(email: user.email)
+                    token = AuthenticationTokenService.call(new_user.id)
+                    render json: { token: token }, status: :created 
                 else
                     render json: { error: "Failed to create user" }, status: :unprocessable_entity
                 end
@@ -55,7 +57,7 @@ module Api
             end
 
             def current_user
-                @user = User.find(params[:user_id])
+                @user = User.find(@user_id)
             end
 
             def user_params

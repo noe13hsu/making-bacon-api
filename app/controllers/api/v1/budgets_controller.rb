@@ -12,7 +12,7 @@ module Api
 
             def update
                 budget = @budget
-                if budget.update(budget_params)
+                if budget.update(budget_params.merge(user_id: @user_id))
                     render json: BudgetRepresenter.new(budget).as_json
                 else
                     render json: { error: "Failed to update transaction" }, status: :unprocessable_entity
@@ -26,7 +26,7 @@ module Api
             end
 
             def budget_params
-                params.require(:budget).permit(:user_id, :amount)
+                params.require(:budget).permit(:amount)
             end
         end
     end

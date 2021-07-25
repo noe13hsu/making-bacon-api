@@ -32,6 +32,8 @@ Rails.application.routes.draw do
       put '/user/me', to: 'users#update'
       patch '/user/me', to: 'users#update'
       delete '/user/me', to: 'users#delete'
+      post '/user/me', to: 'users#create'
+
     end
   end
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
