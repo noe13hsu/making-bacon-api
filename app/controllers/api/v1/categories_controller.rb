@@ -29,7 +29,7 @@ module Api
             end
 
             def create
-                category = Category.new(category_params)
+                category = Category.new(category_params.merge(user_id: @user_id))
 
                 if category.save
                     render json: CategoryRepresenter.new(category).as_json, status: :created
@@ -60,7 +60,7 @@ module Api
             end
 
             def category_params
-                params.require(:category).permit(:user_id, :description, :category_type, :id)
+                params.require(:category).permit(:description, :category_type, :id)
             end
         end
     end
