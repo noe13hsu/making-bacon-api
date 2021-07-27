@@ -10,7 +10,9 @@ RSpec.describe User, type: :model do
   it { should validate_presence_of(:password_digest) }
 
   describe 'validate uniqueness of email' do
-    subject { FactoryBot.build(:user) }
-    it { should validate_uniqueness_of(:email) }
+    before do
+      @user = User.create!(name: "foo",email: "foo@gmail.com", password: "111111")
+    end
+    it { should validate_uniqueness_of(:email).on(:create) }
   end
 end

@@ -7,28 +7,10 @@ module Api
             def index
                 # if User.find(params[:user_id])
                 transactions = Transaction.select { |entry| entry.category.user_id == @user_id.to_i}
-
-                render json: TransactionsRepresenter.new(transactions).as_json
+                sort_by_date = transactions.sort {|a, b| b.date - a.date}
+                render json: TransactionsRepresenter.new(sort_by_date).as_json
                 # else record_not_found
                 # end
-            end
-
-            # def income
-            #     income_transactions = current_user_transaction_type("income")
-
-            #     render json: TransactionsRepresenter.new(income_transactions).as_json
-            # end
-
-            # def expense
-            #     expense_transactions = current_user_transaction_type("expense")
-
-            #     render json: TransactionsRepresenter.new(expense_transactions).as_json
-            # end
-
-            def show
-                transaction = @transaction
-
-                render json: TransactionRepresenter.new(transaction).as_json
             end
 
             def create

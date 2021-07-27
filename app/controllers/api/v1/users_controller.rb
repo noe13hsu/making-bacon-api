@@ -44,12 +44,6 @@ module Api
                 end
             end
 
-            def destroy
-                @user.destroy!
-
-                head :no_content
-            end
-
             private
 
             def user
@@ -69,7 +63,7 @@ module Api
             end
 
             def handle_unauthenticated
-                render json: { error: 'Username or password incorrect' }, status: :unauthorized
+                render json: { error: 'Username or password incorrect' }, status: :unprocessable_entity
             end
 
             def parameter_missing

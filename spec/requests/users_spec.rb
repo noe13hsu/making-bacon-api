@@ -1,41 +1,37 @@
 require 'rails_helper'
 
 describe "Users API", type: :request do
-    before(:all) do
-        @user ||= User.create!(name: "foo",email: "foo@gmail.com", password: "111111")
+    before(:each) do
+        @user = User.create!(name: "foo", email: "foo@gmail.com", password: "111111")
     end
 
-    describe 'GET /users/:user_id' do
+    describe 'GET /user/me' do
         it 'returns a user' do
-            get "/api/v1/users/#{@user.id}"
+            get "/api/v1/user/me", headers: { 
+                'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+            } 
+             
 
             expect(response).to have_http_status(:success)
             expect(response_body).to eq(
-                { "id" => @user.id, "name" => "foo", "email" => "foo@gmail.com" }
+                { "name" => "foo" }
             )
         end
     end
 
-    describe 'PUT /users/:user_id' do
+    describe 'PUT /user/me' do
         it 'updates a user' do
             expect {
-                put "/api/v1/users/#{@user.id}", params: { id: @user.id, name: "J0hn", email: "foo@gmail.com", password: "111111"}
+                put "/api/v1/user/me", 
+                    params: { name: "J0hn" }, 
+                    headers: { 
+                        'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+                    } 
             }.to change { User.find(@user.id).name }.from("foo").to("J0hn")
 
             expect(response).to have_http_status(:success)
             expect(response_body).to eq(
-                { "id" => @user.id, "name" => "J0hn", "email" => "foo@gmail.com" }
-            )
-        end
-
-        it 'does not update user email' do
-            expect {
-                put "/api/v1/users/#{@user.id}", params: { user: {id: @user.id, name: "John", "email" => "john@gmail.com", password: "abc111"} }
-            }.not_to change { User.find(@user.id).email }
-
-            expect(response).to have_http_status(:success)
-            expect(response_body).to eq(
-                { "id" => @user.id, "name" => "foo", "email" => "foo@gmail.com" }
+                { "name" => "J0hn" }
             )
         end
     end
@@ -46,21 +42,18 @@ describe "Users API", type: :request do
 
             expect(response).to have_http_status(:created)
             expect(response_body).to eq({
-                "email" => "bar@gmail.com",
-                "id" => User.last.id,
-                "name" => "bar"
+                "token" => AuthenticationTokenService.call(User.last.id)
             })
         end
     end
 
     describe 'POST /api/v1/login' do
-        it 'authenticates a user' do
-            post '/api/v1/login', params: { email: "foo@gmail.com", password: "111111" }
-
+        it 'authenticates the user' do
+            post '/api/v1/login', params: { email: 'foo@gmail.com', password: '111111' }
             expect(response).to have_http_status(:created)
             expect(response_body).to eq({
-                "token" => "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxfQ.DiPWrOKsx3sPeVClrm_j07XNdSYHgBa3Qctosdxax3w"
-            })
+              'token' => AuthenticationTokenService.call(@user.id)
+              })
         end
 
         it 'returns an error if email is missing' do
@@ -68,7 +61,7 @@ describe "Users API", type: :request do
 
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response_body).to eq({
-                "error" => "Param is missing or the value is empty"
+                "error" => "Username or password incorrect"
             })
         end
 
@@ -77,14 +70,17 @@ describe "Users API", type: :request do
 
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response_body).to eq({
-                "error" => "Param is missing or the value is empty"
+                "error" => "Username or password incorrect"
             })
         end
 
         it 'returns error when password is incorrect' do
             post '/api/v1/login', params: { email: "foo@gmail.com", password: "incorrect" }
 
-            expect(response).to have_http_status(:unauthorized) # no response body so hackers wont know whether it is username or password that is incorrect
+            expect(response).to have_http_status(:unprocessable_entity) # no response body so hackers wont know whether it is username or password that is incorrect
+            expect(response_body).to eq({
+                "error" => "Username or password incorrect"
+            })
         end
     end
 end
