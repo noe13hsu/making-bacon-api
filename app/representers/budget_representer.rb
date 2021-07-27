@@ -5,8 +5,7 @@ class BudgetRepresenter
 
     def as_json
         {
-            id: budget.id,
-            amount: budget.amount,
+            amount: budget.amount.to_f,
         }
     end
 

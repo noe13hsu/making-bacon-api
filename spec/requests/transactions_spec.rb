@@ -1,20 +1,24 @@
 require 'rails_helper'
 
 RSpec.describe "Transactions", type: :request do
-  before(:all) do
-    @user ||= User.create!(name: "foo", email: "foo@gmail.com", password: "111111")
+  before(:each) do
+    @user = User.create!(name: "foo", email: "foo@gmail.com", password: "111111")
 
-    @food ||= Category.create!(description: "food", category_type: "expense", user_id: @user.id)
-    @rental ||= Category.create!(description: "rental", category_type: "income", user_id: @user.id)
+    @food = Category.create!(description: "food", category_type: "Expense", user_id: @user.id)
+    @rental = Category.create!(description: "rental", category_type: "Income", user_id: @user.id)
 
-    @pizza ||= Transaction.create!(description: "pizza", category_id: @food.id, amount: 10.5, date: "2021-05-23")
+    @pizza = Transaction.create!(description: "pizza", category_id: @food.id, amount: 10.5, date: "2021-05-23")
   end
 
-  describe 'POST /users/:user_id/transactions' do
+  describe 'POST /user/transactions' do
     it 'creates a new expense transaction' do
       expect {
-          post "/api/v1/users/#{@user.id}/transactions", params: { transaction: {description: "bread", category_id: @food.id, amount: 3.5, date: "2021-06-23"} }
-      }.to change { transaction_category_type("expense").count }.from(1).to(2)
+          post "/api/v1/user/transactions", 
+            params: { transaction: {description: "bread", category_id: @food.id, amount: 3.5, date: "2021-06-23"} }, 
+            headers: { 
+              'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+            } 
+      }.to change { transaction_category_type("Expense").count }.from(1).to(2)
 
       expect(response).to have_http_status(:created)
       expect(response_body).to eq(
@@ -24,15 +28,19 @@ RSpec.describe "Transactions", type: :request do
           "date" => "2021-06-23",
           "description" => "bread",
           "id" => Transaction.last.id,
-          "type" => "expense"
+          "type" => "Expense"
         }
       )
     end
 
     it 'creates a new income transaction' do
       expect {
-        post "/api/v1/users/#{@user.id}/transactions", params: { transaction: {description: "rental income", category_id: @rental.id, amount: 300.0, date: "2021-06-23"} }
-      }.to change { transaction_category_type("income").count }.from(0).to(1)
+        post "/api/v1/user/transactions", 
+          params: { transaction: {description: "rental income", category_id: @rental.id, amount: 300.0, date: "2021-06-23"} }, 
+          headers: { 
+            'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+          } 
+      }.to change { transaction_category_type("Income").count }.from(0).to(1)
 
       expect(response).to have_http_status(:created)
       expect(response_body).to eq(
@@ -42,54 +50,20 @@ RSpec.describe "Transactions", type: :request do
           "date" => "2021-06-23",
           "description" => "rental income",
           "id" => Transaction.last.id,
-          "type" => "income"
+          "type" => "Income"
         }
       )
     end
   end
 
-  describe 'GET /users/:user_id/transactions/:id' do
-    it 'returns a transaction' do
-      get "/api/v1/users/#{@user.id}/transactions/#{@pizza.id}"
-
-      expect(response).to have_http_status(:success)
-      expect(response_body).to eq(
-        { 
-          "id" => @pizza.id, 
-          "description" => "pizza", 
-          "amount" => "10.5",
-          "category" => "food",
-          "date" => "2021-05-23",
-          "type" => "expense"
-        }
-      )
-    end
-  end
-
-  describe 'GET /users/:user_id/expense_transactions/' do
-    it 'returns all expense transactions' do
-      get "/api/v1/users/#{@user.id}/expense_transactions"
-
-      expect(response).to have_http_status(:success)
-      expect(response_body).to eq(
-        [
-          {
-            "amount"=>"10.5", 
-            "category"=>"food", 
-            "date"=>"2021-05-23", 
-            "description"=>"pizza", 
-            "id"=> @pizza.id, 
-            "type"=>"expense"
-          }
-        ]
-      )
-    end
-  end
-
-  describe 'PUT /users/:user_id/transactions/:id' do
+  describe 'PUT /user/transactions/:id' do
     it 'updates a transaction description' do
       expect {
-        put "/api/v1/users/#{@user.id}/transactions/#{@pizza.id}", params: { transaction: {description: "kebab", category_id: @food.id, amount: 3.5, date: "2021-06-23"} }
+        put "/api/v1/user/transactions/#{@pizza.id}", 
+          params: { transaction: {description: "kebab", category_id: @food.id, amount: 3.5, date: "2021-06-23"} }, 
+          headers: { 
+            'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+          } 
       }.to change { Transaction.find(@pizza.id).description }.from("pizza").to("kebab")
 
       expect(response).to have_http_status(:success)
@@ -100,52 +74,41 @@ RSpec.describe "Transactions", type: :request do
           "category" => "food",
           "date" => "2021-06-23",
           "description" => "kebab",
-          "type" => "expense" 
+          "type" => "Expense" 
         }
       )
     end
 
-    it 'updates a transaction amount' do
+    it 'updates a transaction' do
       expect {
-        put "/api/v1/users/#{@user.id}/transactions/#{@pizza.id}", params: { transaction: {description: "pizza", category_id: @food.id, amount: 4.5, date: "2021-06-23"} }
-      }.to change { Transaction.find(@pizza.id).amount }.from((10.5).to_d).to(4.5)
-
-      expect(response).to have_http_status(:success)
-      expect(response_body).to eq(
-        { 
-          "id" => @pizza.id,
-          "amount" => "4.5",
-          "category" => "food",
-          "date" => "2021-06-23",
-          "description" => "pizza",
-          "type" => "expense" 
-        }
-      )
-    end
-
-    it 'updates a transaction date' do
-      expect {
-        put "/api/v1/users/#{@user.id}/transactions/#{@pizza.id}", params: { transaction: {description: "pizza", category_id: @food.id, amount: 10.5, date: "2021-05-16"} }
+        put "/api/v1/user/transactions/#{@pizza.id}", 
+          params: { transaction: {description: "pizza", category_id: @food.id, amount: 100.5, date: "2021-05-16"} }, 
+          headers: { 
+            'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+          } 
       }.to change { Transaction.find(@pizza.id).date }.from("2021-05-23".to_date).to("2021-05-16".to_date)
 
       expect(response).to have_http_status(:success)
       expect(response_body).to eq(
         { 
           "id" => @pizza.id,
-          "amount" => "10.5",
+          "amount" => "100.5",
           "category" => "food",
           "date" => "2021-05-16",
           "description" => "pizza",
-          "type" => "expense" 
+          "type" => "Expense" 
         }
       )
     end
   end
 
-  describe 'DELETE /users/:user_id/transactions/:id' do
+  describe 'DELETE /user/transactions/:id' do
     it 'deletes a transaction' do
       expect {
-        delete "/api/v1/users/#{@user.id}/transactions/#{@pizza.id}"
+        delete "/api/v1/user/transactions/#{@pizza.id}", 
+        headers: { 
+          'Authorization': "Bearer #{AuthenticationTokenService.call(@user.id)}"
+        } 
       }.to change { Transaction.where(id: @pizza.id).exists? }.from(true).to(false) 
 
       expect(response).to have_http_status(:no_content)

@@ -10,24 +10,6 @@ module Api
                 render json: CategoriesRepresenter.new(categories).as_json
             end
 
-            # def income
-            #     income_categories = current_user_category_type("income")
-
-            #     render json: CategoriesRepresenter.new(income_categories).as_json
-            # end
-
-            # def expense
-            #     expense_categories = current_user_category_type("expense")
-
-            #     render json: CategoriesRepresenter.new(expense_categories).as_json
-            # end
-
-            def show
-                category = @category
-
-                render json: CategoryRepresenter.new(category).as_json
-            end
-
             def create
                 category = Category.new(category_params.merge(user_id: @user_id))
 
